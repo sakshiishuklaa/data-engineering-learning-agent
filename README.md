@@ -1,6 +1,6 @@
 # Data Engineering Learning Coach
 
-Module 0 establishes the Python application foundation for a future AI-powered data engineering learning coach. It deliberately does not implement agent behavior or learning features yet.
+Module 1 adds structured, queryable learner memory while deliberately keeping LLM/agent behavior out of scope.
 
 ## Stack
 
@@ -17,7 +17,7 @@ app/
   api/        HTTP routes
   agent/      future AI-agent boundary
   database/   SQLAlchemy engine, sessions, and initialization
-  models/     future database models
+  models/     learner-memory database models
   prompts/    future prompt assets
   schemas/    Pydantic API schemas
   services/   application service layer
@@ -63,3 +63,11 @@ streamlit run app/ui/streamlit_app.py
 ```bash
 pytest
 ```
+
+## Learner memory
+
+The database persists learner profiles, a canonical skill catalog, per-learner
+skill assessments, learning-topic progress, and portfolio projects. The
+session-based CRUD functions live in `app/services/learner_memory_service.py`,
+keeping this memory usable from future API and UI layers without coupling it to
+an LLM.
