@@ -1,6 +1,6 @@
 # Data Engineering Learning Coach
 
-Module 1 adds structured, queryable learner memory while deliberately keeping LLM/agent behavior out of scope.
+Modules 1–3 add structured learner memory, a local Streamlit onboarding flow, and an evidence-weighted skill assessment while deliberately keeping LLM/agent behavior out of scope.
 
 ## Stack
 
@@ -71,3 +71,9 @@ skill assessments, learning-topic progress, and portfolio projects. The
 session-based CRUD functions live in `app/services/learner_memory_service.py`,
 keeping this memory usable from future API and UI layers without coupling it to
 an LLM.
+
+## Learner onboarding and assessment
+
+The Streamlit UI collects background, skill self-assessments, career goals, schedule, and learning preference. It validates required fields and feasible numeric values, persists one local onboarding profile, and shows an **Edit profile** action once it exists.
+
+Module 3 covers 18 data-engineering skills on a 1–10 scale. It combines self-report with optional diagnostic, quiz, and project-evidence scores, then shows score, proficiency level, target gap, and priority. Self-report-only results are explicitly low confidence. Roadmap generation is intentionally out of scope.
