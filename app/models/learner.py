@@ -35,6 +35,44 @@ class Learner(Base):
         back_populates="learner", cascade="all, delete-orphan"
     )
     projects: Mapped[list[Project]] = relationship(back_populates="learner", cascade="all, delete-orphan")
+    onboarding_profile: Mapped[OnboardingProfile | None] = relationship(
+        back_populates="learner", cascade="all, delete-orphan", uselist=False
+    )
+
+
+class OnboardingProfile(Base):
+    """The learner information collected during Module 2 onboarding."""
+
+    __tablename__ = "onboarding_profiles"
+
+    learner_id: Mapped[int] = mapped_column(ForeignKey("learners.id", ondelete="CASCADE"), primary_key=True)
+    current_role: Mapped[str] = mapped_column(String(255), nullable=False)
+    experience_years: Mapped[float] = mapped_column(Float, nullable=False)
+    education: Mapped[str] = mapped_column(String(255), nullable=False)
+    python_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    sql_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    database_experience: Mapped[str] = mapped_column(String(50), nullable=False)
+    cloud_experience: Mapped[str] = mapped_column(String(50), nullable=False)
+    git_github_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    linux_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    etl_elt_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    data_warehousing_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    spark_pyspark_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    airflow_orchestration_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    docker_level: Mapped[str] = mapped_column(String(50), nullable=False)
+    existing_projects: Mapped[str | None] = mapped_column(Text)
+    target_role: Mapped[str] = mapped_column(String(255), nullable=False)
+    target_company_type: Mapped[str] = mapped_column(String(255), nullable=False)
+    preferred_cloud: Mapped[str] = mapped_column(String(100), nullable=False)
+    study_hours_per_week: Mapped[float] = mapped_column(Float, nullable=False)
+    target_timeline: Mapped[str] = mapped_column(String(255), nullable=False)
+    learning_preference: Mapped[str] = mapped_column(String(100), nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(
+        DateTime(timezone=True), server_default=func.now(), onupdate=func.now(), nullable=False
+    )
+
+    learner: Mapped[Learner] = relationship(back_populates="onboarding_profile")
 
 
 class Skill(Base):

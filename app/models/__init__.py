@@ -1,5 +1,5 @@
 """SQLAlchemy domain models for structured learner memory."""
 
-from app.models.learner import Learner, LearnerSkill, LearningProgress, Project, Skill
+from app.models.learner import Learner, LearnerSkill, LearningProgress, OnboardingProfile, Project, Skill
 
-__all__ = ["Learner", "Skill", "LearnerSkill", "LearningProgress", "Project"]
+__all__ = ["Learner", "Skill", "LearnerSkill", "LearningProgress", "OnboardingProfile", "Project"]
