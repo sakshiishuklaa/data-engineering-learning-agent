@@ -35,6 +35,7 @@ class Learner(Base):
         back_populates="learner", cascade="all, delete-orphan"
     )
     projects: Mapped[list[Project]] = relationship(back_populates="learner", cascade="all, delete-orphan")
+    quiz_attempts: Mapped[list[QuizAttempt]] = relationship(back_populates="learner", cascade="all, delete-orphan")
     onboarding_profile: Mapped[OnboardingProfile | None] = relationship(
         back_populates="learner", cascade="all, delete-orphan", uselist=False
     )
@@ -100,6 +101,30 @@ class LearnerSkill(Base):
 
     learner: Mapped[Learner] = relationship(back_populates="skills")
     skill: Mapped[Skill] = relationship(back_populates="learners")
+
+
+class QuizAttempt(Base):
+    """One evaluated quiz answer used as evidence for learner skill updates."""
+
+    __tablename__ = "quiz_attempts"
+
+    id: Mapped[int] = mapped_column(Integer, primary_key=True)
+    learner_id: Mapped[int] = mapped_column(ForeignKey("learners.id", ondelete="CASCADE"), nullable=False, index=True)
+    skill_id: Mapped[int] = mapped_column(ForeignKey("skills.id", ondelete="CASCADE"), nullable=False, index=True)
+    topic: Mapped[str] = mapped_column(String(255), nullable=False, index=True)
+    difficulty: Mapped[str] = mapped_column(String(50), nullable=False, index=True)
+    question: Mapped[str] = mapped_column(Text, nullable=False)
+    learner_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    score: Mapped[float] = mapped_column(Float, nullable=False)
+    correct_points: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    missing_points: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    mistakes: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
+    improved_answer: Mapped[str] = mapped_column(Text, nullable=False)
+    recommended_action: Mapped[str] = mapped_column(Text, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), nullable=False)
+
+    learner: Mapped[Learner] = relationship(back_populates="quiz_attempts")
+    skill: Mapped[Skill] = relationship()
 
 
 class LearningProgress(Base):

@@ -31,6 +31,23 @@ from app.schemas.teaching import (
     TeachingResponse,
     TeachingSession,
 )
+from app.schemas.quiz import (
+    AnswerEvaluation,
+    Quiz,
+    QuizAnswerResult,
+    QuizDifficulty,
+    QuizQuestion as EvaluationQuizQuestion,
+    QuizTopic,
+)
+from app.schemas.progress import (
+    NextRecommendation,
+    PhaseProgressSummary,
+    ProgressDashboard,
+    ProjectProgressSummary,
+    QuizPerformanceSummary,
+    SkillProgressSummary,
+    TopicProgressSummary,
+)
 
 __all__ = [
     "AssessmentResult",
@@ -57,4 +74,17 @@ __all__ = [
     "TeachingRequest",
     "TeachingResponse",
     "TeachingSession",
+    "AnswerEvaluation",
+    "EvaluationQuizQuestion",
+    "Quiz",
+    "QuizAnswerResult",
+    "QuizDifficulty",
+    "QuizTopic",
+    "NextRecommendation",
+    "PhaseProgressSummary",
+    "ProgressDashboard",
+    "ProjectProgressSummary",
+    "QuizPerformanceSummary",
+    "SkillProgressSummary",
+    "TopicProgressSummary",
 ]

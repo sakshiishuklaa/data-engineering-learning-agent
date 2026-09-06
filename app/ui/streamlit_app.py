@@ -13,6 +13,7 @@ from app.logging_config import configure_logging
 from app.schemas.assessment import SkillAssessmentInput
 from app.services.assessment_service import DATA_ENGINEERING_SKILLS, DIAGNOSTIC_QUESTIONS, assess_skills
 from app.services.onboarding_service import SKILL_LEVELS, get_existing_onboarding_profile, save_onboarding_profile
+from app.services.progress_service import get_progress_dashboard
 
 settings = get_settings()
 configure_logging(settings.log_level)
@@ -115,6 +116,130 @@ def assessment_form() -> None:
         st.caption("Confidence reflects evidence supplied. Self-report-only results are low confidence.")
 
 
+def progress_dashboard(learner_id: int) -> None:
+    """Render Module 9 progress tracking from durable learner state."""
+    with database_session() as session:
+        dashboard = get_progress_dashboard(
+            session,
+            learner_id,
+            roadmap=st.session_state.get("personalized_roadmap"),
+        )
+
+    st.subheader("Learner Progress Dashboard")
+    col1, col2, col3, col4 = st.columns(4)
+    col1.metric("Overall Progress", f"{dashboard.overall_progress_percentage}%")
+    col2.metric("Roadmap Completion", f"{dashboard.roadmap_completion_percentage}%")
+    col3.metric("Study Streak", f"{dashboard.study_streak_days} days")
+    quiz_value = "No attempts" if dashboard.quiz_average_score is None else f"{dashboard.quiz_average_score}/10"
+    col4.metric("Quiz Average", quiz_value)
+
+    st.markdown("### Current Phase")
+    if dashboard.current_phase is None:
+        st.info("No roadmap phases are available yet.")
+    else:
+        st.write(f"Phase {dashboard.current_phase.phase}: {dashboard.current_phase.goal}")
+        st.progress(dashboard.current_phase.completion_percentage / 100)
+        st.caption(
+            f"{dashboard.current_phase.completed_topics}/{dashboard.current_phase.total_topics} topics completed"
+        )
+
+    st.markdown("### What should I do next?")
+    st.info(f"{dashboard.next_recommendation.title} — {dashboard.next_recommendation.rationale}")
+
+    skills_tab, topics_tab, tasks_tab, weak_tab, projects_tab, quizzes_tab = st.tabs(
+        ["Skills", "Completed Topics", "Upcoming Tasks", "Weak Areas", "Project Progress", "Recent Quiz Performance"]
+    )
+    with skills_tab:
+        if dashboard.skills:
+            st.table(
+                [
+                    {
+                        "Skill": skill.skill,
+                        "Current": skill.current_score,
+                        "Target": skill.target_score,
+                        "Progress": f"{skill.progress_to_target_percentage}%",
+                        "Gap": skill.improvement_needed,
+                    }
+                    for skill in dashboard.skills
+                ]
+            )
+        else:
+            st.info("No skill records are tracked yet.")
+    with topics_tab:
+        if dashboard.completed_topics:
+            st.table(
+                [
+                    {
+                        "Topic": topic.topic,
+                        "Score": topic.score,
+                        "Completed": f"{topic.completion_percentage}%",
+                    }
+                    for topic in dashboard.completed_topics
+                ]
+            )
+        else:
+            st.info("No completed topics yet.")
+    with tasks_tab:
+        if dashboard.upcoming_tasks:
+            st.table(
+                [
+                    {
+                        "Topic": topic.topic,
+                        "Status": topic.status,
+                        "Progress": f"{topic.completion_percentage}%",
+                    }
+                    for topic in dashboard.upcoming_tasks
+                ]
+            )
+        else:
+            st.info("No upcoming tracked tasks.")
+    with weak_tab:
+        if dashboard.weak_areas:
+            st.table(
+                [
+                    {
+                        "Skill": skill.skill,
+                        "Current": skill.current_score,
+                        "Target": skill.target_score,
+                        "Gap": skill.improvement_needed,
+                    }
+                    for skill in dashboard.weak_areas
+                ]
+            )
+        else:
+            st.success("No weak areas are currently tracked.")
+    with projects_tab:
+        if dashboard.projects:
+            st.table(
+                [
+                    {
+                        "Project": project.project_name,
+                        "Status": project.status,
+                        "Progress": f"{project.completion_percentage}%",
+                        "Technologies": ", ".join(project.technologies),
+                    }
+                    for project in dashboard.projects
+                ]
+            )
+        else:
+            st.info("No projects are tracked yet.")
+    with quizzes_tab:
+        if dashboard.recent_quiz_performance:
+            st.table(
+                [
+                    {
+                        "Topic": quiz.topic,
+                        "Difficulty": quiz.difficulty,
+                        "Score": quiz.score,
+                        "Recommended Action": quiz.recommended_action,
+                    }
+                    for quiz in dashboard.recent_quiz_performance
+                ]
+            )
+        else:
+            st.info("No quiz attempts yet.")
+
+
 with database_session() as session:
     profile = get_existing_onboarding_profile(session)
 
@@ -126,6 +251,7 @@ if profile is not None and not st.session_state.get("edit_profile", False):
     if st.button("Edit profile"):
         st.session_state.edit_profile = True
         st.rerun()
+    progress_dashboard(profile.learner_id)
     assessment_form()
 else:
     profile_form(profile)

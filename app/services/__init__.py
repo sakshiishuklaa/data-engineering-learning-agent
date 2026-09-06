@@ -20,6 +20,19 @@ from app.services.teaching_service import (
     handle_teaching_command,
     parse_teaching_command,
 )
+from app.services.quiz_service import (
+    evaluate_learner_answer,
+    get_quiz,
+    list_quiz_questions,
+    submit_quiz_answer,
+)
+from app.services.progress_service import (
+    calculate_overall_progress,
+    calculate_phase_completion,
+    calculate_study_streak,
+    get_progress_dashboard,
+    recommend_next_action,
+)
 
 __all__ = [
     "create_learner",
@@ -39,4 +52,13 @@ __all__ = [
     "extract_topic",
     "handle_teaching_command",
     "parse_teaching_command",
+    "evaluate_learner_answer",
+    "get_quiz",
+    "list_quiz_questions",
+    "submit_quiz_answer",
+    "calculate_overall_progress",
+    "calculate_phase_completion",
+    "calculate_study_streak",
+    "get_progress_dashboard",
+    "recommend_next_action",
 ]
